@@ -1,7 +1,8 @@
+#include <sstream>
+#include <fstream>
+
 #include "Gamestate.h"
 #include "Graphic_Object.h"
-#include <sstream>
-
 
 /*
 Gamestate();
@@ -14,15 +15,16 @@ void order_unit(int pos_x, int pos_y, std::string order_type);
 void action_check();
 */
 
-Gamestate::Gamestate(int size_x, int size_y, Graphic_Object* null_object) : terrain(size_x, size_y, filler), ingame(size_x, size_y, filler), filler(null_object)
+Gamestate::Gamestate(int size_x, int size_y, Graphic_Object* null_object) : terrain(size_x, size_y, null_object), ingame(size_x, size_y, null_object), null_game_object(null_object)
 {
 }
 
+Gamestate::Gamestate(std::ifstream & load_from) : terrain(load_from), ingame(load_from)
+{
+}
 
 Gamestate::~Gamestate()
 {
-	//this->terrain.~Map();
-	//this->ingame.~Map();
 }
 
 void Gamestate::tmp_set_filler(char znak_fillera)
@@ -30,6 +32,13 @@ void Gamestate::tmp_set_filler(char znak_fillera)
 	this->filler = new Graphic_Object(znak_fillera);
 	return;
 }
+
+void Gamestate::save_Gamestate(std::ofstream & save_here)
+{
+	terrain.save_Map(save_here);
+	ingame.save_Map(save_here);
+}
+
 
 std::string Gamestate::draw()
 {

@@ -1,37 +1,56 @@
+#include <string>
+#include <sstream>
+#include <fstream>
+
 #include "Match.h"
 #include "Program_Core.h"
 #include "Graphic_Object.h"
-#include <string>
-#include <sstream>
 
-Program_Core Core;	//forward declaration of program core
 //Graphic_Object* Match::null_game_object = (Graphic_Object*)0;	//setting up the null object. this pointer will be copied to Gamestate
 
-Match::Match(int mapsize_x, int mapsize_y, int _players) : null_game_object(new Graphic_Object('X')), players_num(_players)
+Graphic_Object* Match::null_graphic_object = new Graphic_Object(' ');
+
+Match::Match(int _mapsize_x, int _mapsize_y, int _players) : number_of_active_users(_players)
 {
-	gamestate = new Gamestate(mapsize_x, mapsize_y, null_game_object);
-	now_selected = new Graphic_Object*[players_num];
-	for (int i = 0; i < players_num; i++)
+	gamestate = new Gamestate(_mapsize_x, _mapsize_y, null_graphic_object);
+	mapsize_x = _mapsize_x;
+	mapsize_y = _mapsize_y;
+	now_selected = new Graphic_Object*[number_of_active_users];
+	for (int i = 0; i < number_of_active_users; i++)
 	{
-		now_selected[i] = this->null_game_object;
-		player_streams[i] = new std::stringstream;
+		now_selected[i] = null_graphic_object;
+		player_streams.push_back(new std::stringstream);
 	}
 }
 
+Match::Match(std::ifstream & load_from)
+{
+	load_from >> turn_number >> number_of_active_users >> mapsize_x >> mapsize_y;
+	gamestate = new Gamestate(load_from);
+	for (int i = 0; i < number_of_active_users; i++)
+	{
+		//now_selected[i] = null_game_object;
+		player_streams.push_back(new std::stringstream);
+	}
+}
 
 Match::~Match()
 {
 }
 
+void Match::save_Match(std::ofstream & save_here)
+{
+	save_here << turn_number << ' ' << number_of_active_users << ' ' << mapsize_x << ' ' << mapsize_y << ' ';
+	gamestate->save_Gamestate(save_here);
+}
+
 void Match::draw_match()
 { 
-	std::string tmp_string;
-	tmp_string = gamestate->draw();
-	std::stringstream ssvisible_match;
-
-	for (int i = 0; i < players_num; i++)
+	for (int i = 0; i < number_of_active_users; i++)
 	{
-		
+		player_streams[i]->clear();
+		*(player_streams[i]) << mapsize_x << ' ' << mapsize_y << ' ' << gamestate->draw() << " CranK " << "ducked " << 9001 ;
+
 	}
 	return;
 }

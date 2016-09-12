@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <fstream>
+
 #include "Graphic_Object.h"
 
 class Map
@@ -11,10 +13,10 @@ class Map
 	Graphic_Object* null_elem;
 public:
 	Map(int, int, Graphic_Object*);
-	Map(std::istream&);
+	Map(std::ifstream &);
 	~Map();
 
-	void save_Map(std::ostream&);
+	void save_Map(std::ofstream &);
 	void add_object(Graphic_Object&, int, int);
 	std::string & draw();
 
