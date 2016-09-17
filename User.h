@@ -20,7 +20,6 @@ class User
 	static int number_of_active_users;
 	std::stringstream user_input;
 public:
-	enum user_option{ user_height, user_width, user_brick };
 
 	User(int height = 15, int width = 30);
 	~User();
@@ -28,7 +27,7 @@ public:
 	std::stringstream & give_input();			//returns the user input
 
 	//
-	int modify_setting(user_option);	//modifies the user setting of par1 number, for a value of par2
+	void modify_setting();	//modifies the user setting of par1 number, for a value of par2
 	void show_user_stats(std::ostream&);	//prints user statistics to the ostream
 	void show_user_settings(std::ostream&);	//prints user settings to the stream
 	int get_height() { return screen_height; }
@@ -42,6 +41,7 @@ public:
 	void draw_interface_line(std::string &, const char);
 	void draw_mapview(std::string &, std::string &);
 	void draw_ui(std::string &, std::stringstream &);
+	void draw_menu();
 
 	static void init_player_number(){ number_of_active_users = 0; }
 };

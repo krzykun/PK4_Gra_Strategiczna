@@ -19,7 +19,7 @@ Gamestate::Gamestate(int size_x, int size_y, Graphic_Object* null_object) : terr
 {
 }
 
-Gamestate::Gamestate(std::ifstream & load_from) : terrain(load_from), ingame(load_from)
+Gamestate::Gamestate(std::ifstream & load_from) : terrain(load_from, 0), ingame(load_from, 1)
 {
 }
 
@@ -54,4 +54,14 @@ std::string Gamestate::draw()
 	std::string screenstring = "";
 	screenstring += terrain_tmp;
 	return screenstring;
+}
+
+void Gamestate::implement_turn()
+{
+	ingame.implement_turn();
+}
+
+std::string Gamestate::show_selection(int pos_x, int pos_y)
+{
+	return ingame.show_selection(pos_x, pos_y);
 }

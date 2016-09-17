@@ -19,7 +19,10 @@ public:
 	void tmp_set_filler(char znak_fillera = 'X');
 	void save_Gamestate(std::ofstream &);
 	std::string draw();
+
 	void order_unit(int pos_x, int pos_y, std::string order_type);
-	void action_check();
+	void implement_turn();
+
+	std::string show_selection(int, int);
 };
 

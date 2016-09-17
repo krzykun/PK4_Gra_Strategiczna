@@ -9,7 +9,7 @@ int User::number_of_active_users;
 User::User(int height, int width)
 {
 	user_number = number_of_active_users;
-	number_of_active_users++;
+	User::number_of_active_users++;
 	screen_height = height;
 	scren_total_height = height + 5;
 	screen_width = width;
@@ -21,13 +21,15 @@ User::User(int height, int width)
 
 User::~User()
 {
-	number_of_active_users--;
+	User::number_of_active_users--;
 }
 
 void User::read_user_input()
 {
-	std::cout << "command> ";
-	char* tmp;
+	user_input.clear();
+	draw_menu();
+	std::cout << "\nCommand> ";
+	char* tmp = new char[50];
 	std::cin.getline(tmp, 50);
 	user_input << tmp;
 }
@@ -36,6 +38,34 @@ std::stringstream & User::give_input()
 {
 	read_user_input();
 	return user_input;
+}
+
+void User::modify_setting()
+{
+	user_option option = user_height;
+	user_input >> option;
+	if (option == 0)
+	{
+		int new_height;
+		user_input >> new_height;
+		screen_height = new_height;
+		std::cout << "New height is " << screen_height << std::endl;
+	}
+	else if (option == 1)
+	{
+		int new_width;
+		user_input >> new_width;
+		screen_width = new_width;
+		std::cout << "New width is " << screen_width << std::endl;
+	}
+	else if (option == 2)
+	{
+		char new_brick;
+		user_input >> new_brick;
+		interface_brick = new_brick;
+		std::cout << "New brick is " << interface_brick << std::endl;
+	}
+
 }
 
 void User::prepare_mapview(std::string & mapview, int mapsize_x, int mapsize_y)
@@ -111,6 +141,10 @@ void User::draw_ui(std::string & interface, std::stringstream & output_stream)
 	interface += ' ';
 	interface += interface_brick;
 	interface += '\n';
+	interface += interface_brick;
+	interface += ' ';
+	interface += "HEALTH:";
+	interface += health;
 }
 
 void User::show_to_player(std::stringstream & output_stream)
@@ -130,5 +164,16 @@ void User::show_to_player(std::stringstream & output_stream)
 	draw_ui(interface, output_stream);
 	draw_interface_line(interface, interface_brick);
 
+	std::cout << interface << std::endl;
+}
+
+void User::draw_menu()
+{
+	std::string interface = "";
+	draw_interface_line(interface, interface_brick);
+	interface += "\n STRATEGY GAME MENU\nAvailable commands:\n\n";
+	interface += "User options: change [height/width/brick] [new value]\n";
+	interface += "create match [mapsize]\nload match [filename]\nsave match [filename]\n";
+	draw_interface_line(interface, interface_brick);
 	std::cout << interface << std::endl;
 }

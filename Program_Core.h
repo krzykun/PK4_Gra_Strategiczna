@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include "local_types_definitions.h"
 #include "Match.h"
 #include "User.h"
 
@@ -20,17 +21,19 @@ public:
 	void interpret_user_command();
 
 	//menu functions
-	void create_new_match(user_action, std::stringstream &);
-	void save_match(user_action, std::stringstream &);
-	void load_match(user_action, std::stringstream &);
-	void change_user_option(user_action, std::stringstream &);
-	void inmatch_command(user_action, std::stringstream &);
+	void create_new_match(int, user_action, std::stringstream &);
+	void save_match(int, user_action, std::stringstream &);
+	void load_match(int, user_action, std::stringstream &);
+	void change_user_option(int, user_action, std::stringstream &);
+	void inmatch_command(int, user_action, std::stringstream &);
+	void add_new_user(int, user_action, std::stringstream &);
+	void delete_user(int, user_action, std::stringstream &);
+	void exit(int, user_action, std::stringstream &);
 
 	//side functions
 	void print_for_user(int player_id, std::stringstream print_this);
 	int how_many_active_users(){ return number_of_active_users; }
 	bool is_match_in_progress();
-	void add_user(User*);
 	void draw_match();
 };
 

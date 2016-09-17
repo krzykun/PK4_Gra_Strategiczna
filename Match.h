@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "Gamestate.h"
+#include "Game_Object.h"
 class Match
 {
 	Gamestate* gamestate;
@@ -14,22 +15,27 @@ class Match
 	int number_of_active_users;
 	int mapsize_x;
 	int mapsize_y;
-	Graphic_Object** now_selected;	//array of units selected by users
+	std::vector<int*> selected;	//array of units selected by users
 	static Graphic_Object* null_graphic_object;	//null object used to initialize now_selected array
 										// and used when a unit that is selected dies (resets the user selection)_
 public:
 	std::vector<std::stringstream*> player_streams;
 
 	Match(int, int, int);
+	Match(std::stringstream &, int);
 	Match(std::ifstream &);	//for loading a match
 	~Match();
 
 	void save_Match(std::ofstream &);
 	void implement_turn();
-	void interpret_user_command(std::string);
+	void interpret_user_command(int, user_action, std::stringstream &);
 	void draw_match();
+
+	void change_selection(int, std::stringstream &);
+	
 
 	int* return_object_selected_by(int player_number);	//change int to Game_Object in final version
 	int current_turn_no(){ return turn_number; }
+	void add_stats_death(Game_Object*);	//todo, suspended
 };
 

@@ -8,7 +8,9 @@ class Graphic_Object
 public:
 	Graphic_Object(char _symbol) : symbol(_symbol){}
 	Graphic_Object(std::ifstream &);
-	~Graphic_Object();
+	virtual ~Graphic_Object();
 	char draw() { return symbol; }
+	virtual void save_object(std::ofstream &);
+	virtual std::string print_me();
 };
 
