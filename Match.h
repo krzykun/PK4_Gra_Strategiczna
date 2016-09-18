@@ -16,13 +16,12 @@ class Match
 	int mapsize_x;
 	int mapsize_y;
 	std::vector<int*> selected;	//array of units selected by users
-	static Graphic_Object* null_graphic_object;	//null object used to initialize now_selected array
-										// and used when a unit that is selected dies (resets the user selection)_
 public:
+	static Graphic_Object* null_graphic_object;	//null object used to initialize now_selected array
+												// and used when a unit that is selected dies (resets the user selection)
 	std::vector<std::stringstream*> player_streams;
 
 	Match(int, int, int);
-	Match(std::stringstream &, int);
 	Match(std::ifstream &);	//for loading a match
 	~Match();
 

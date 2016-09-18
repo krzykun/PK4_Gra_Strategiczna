@@ -5,6 +5,7 @@
 #include "Game_Object.h"
 #include "Game_Obj_Tree.h"
 #include "Unit_Knight.h"
+#include "exc_base.h"
 
 Map::Map(int size_x, int size_y, Graphic_Object* filler)
 {
@@ -20,7 +21,7 @@ Map::Map(int size_x, int size_y, Graphic_Object* filler)
 	null_elem = filler;
 }
 
-Map::Map(std::ifstream & load_from, int map_type)
+Map::Map(std::ifstream & load_from, int map_type, Graphic_Object* _null_elem)
 {
 	if (!map_type)
 	{
@@ -36,6 +37,7 @@ Map::Map(std::ifstream & load_from, int map_type)
 	}
 	else
 	{
+		null_elem = _null_elem;
 		load_from >> mapsize_x >> mapsize_y;
 		gamefield = new Graphic_Object**[mapsize_x];
 		for (int i = 0; i < mapsize_x; i++)
@@ -43,31 +45,38 @@ Map::Map(std::ifstream & load_from, int map_type)
 			gamefield[i] = new Graphic_Object*[mapsize_y];
 			for (int j = 0; j < mapsize_y; j++)
 			{
+				if (!load_from)
+				{
+					throw exc_base("Loading unsuccesful. Stream is failing.\n");
+				}
 				char tmp_char;
 				int owner;
-				load_from >> tmp_char >> owner;
+				load_from.get();
+				tmp_char = load_from.peek();
 				switch (tmp_char)
 				{
 				case 'T':
 				{
-					gamefield[i][j] = new Game_Obj_Tree(owner,i, j);
+					gamefield[i][j] = new Game_Obj_Tree(i, j, load_from);
 					break;
 				}
 				case 'K':
 				{
-					gamefield[i][j] = new Unit_Knight(owner, i, j);
-					Unit* pUnit = (reinterpret_cast<Unit*>(gamefield[i][j]));
-					pUnit->set_target(pUnit);
+					//load_from >> owner;
+					gamefield[i][j] = new Unit_Knight(i, j, load_from);
+					//Unit* pUnit = (reinterpret_cast<Unit*>(gamefield[i][j]));
 					break;
 				}
 				default:
 				{
 					gamefield[i][j] = null_elem;
+					load_from.ignore(1);
 					break;
 				}
 				}
 
 			}
+			load_from.ignore(1);		//ignore the '\n' symbols
 			//FUTURE TODO: bc element can be larger than 1 square, we check if it is repeated above or
 			//just before our field. if it is, we tie it to that. if its not, we create a new one
 			//FUTURE TODO: a list of symbols that need to be checked
@@ -100,7 +109,7 @@ void Map::implement_turn()
 		for (int j = 0; j < mapsize_y; j++)
 		{
 			//THROW control block?? not needed
-			if (typeid(Unit) == typeid(gamefield[i][j]))
+			if (gamefield[i][j] != null_elem)
 			{
 				Unit* pUnit = reinterpret_cast<Unit*> (gamefield[i][j]);
 				Game_Object* target = pUnit->get_target();
@@ -120,6 +129,7 @@ void Map::implement_turn()
 					unit_wants_to_attack(pUnit, pG_Obj);
 				}
 			}
+			else throw exc_base("Nothing to attack there.\n");
 		}
 	}
 }
@@ -166,7 +176,7 @@ std::string & Map::draw()
 	for (int i = 0; i < mapsize_x; i++)
 	{
 		for (int j = 0; j < mapsize_y; j++)
-			if (gamefield[i][j] != null_elem)
+			//if (gamefield[i][j] != null_elem)
 			previous_map += gamefield[i][j]->draw();
 	}
 	return previous_map;
@@ -174,9 +184,39 @@ std::string & Map::draw()
 
 std::string Map::show_selection(int pos_x, int pos_y)
 {
-	std::string tmp(" Nothing to show. ");
+	std::string tmp(" Nothing to show ");
 	if (gamefield[pos_x][pos_y] == null_elem)
 		return tmp;
 	else
-		return gamefield[pos_x][pos_y]->print_me();
+	{
+		Game_Object* pG_Obj = reinterpret_cast<Game_Object*> (gamefield[pos_x][pos_y]);
+		return pG_Obj->print_me();
+	}
+}
+
+/*quick reminder : 
+enum game_obj_state{ idle, moving, attacking, in_construction };*/
+
+void Map::set_unit_order(int pos_x, int pos_y, user_action action, std::stringstream & command_stream)
+{
+
+	int tarx, tary;
+	command_stream >> tarx >> tary;
+	Unit* pUnit = reinterpret_cast<Unit*> (gamefield[pos_x][pos_y]);
+	if (action == attack)
+	{
+		if (gamefield[tarx][tary] != null_elem)
+		{
+			Game_Object* pG_Obj = reinterpret_cast<Game_Object*> (gamefield[tarx][tary]);
+			pUnit->set_target(pG_Obj);
+			pUnit->set_dxdy(tarx, tary);
+			pUnit->set_state(attacking);
+		}
+		else throw exc_base("Nothing to attack there.\n");
+	}
+	else if (action == move)
+	{
+		pUnit->set_dxdy(tarx, tary);
+		pUnit->set_state(moving);
+	}
 }

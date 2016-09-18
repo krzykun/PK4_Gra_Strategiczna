@@ -10,9 +10,9 @@ class Gamestate
 	Map terrain;
 	Map ingame;
 	Graphic_Object* filler; //temporary variable to have something in the map
-	const Graphic_Object* null_game_object;
 public:
-	Gamestate(int, int, Graphic_Object*);
+	static Graphic_Object* null_game_object;
+	Gamestate(int, int);
 	Gamestate(std::ifstream &);
 	~Gamestate();
 
@@ -20,7 +20,7 @@ public:
 	void save_Gamestate(std::ofstream &);
 	std::string draw();
 
-	void order_unit(int pos_x, int pos_y, std::string order_type);
+	void order_unit(int, int, user_action, std::stringstream &);
 	void implement_turn();
 
 	std::string show_selection(int, int);

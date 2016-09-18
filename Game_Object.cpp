@@ -15,6 +15,7 @@ Game_Object::Game_Object(std::ifstream & load_from) : Graphic_Object(load_from)
 	load_from >> owner;
 	load_from >> health;
 	load_from >> energy;
+	state = idle;
 }
 
 Game_Object::~Game_Object()
@@ -40,6 +41,6 @@ void Game_Object::save_object(std::ofstream & save_here)
 std::string Game_Object::print_me()
 {
 	std::stringstream tmp_str;
-	tmp_str << object_name << state << health;
+	tmp_str << ' ' << object_name << ' ' << state << ' ' << health << ' ' << description << ' ';
 	return tmp_str.str();
 }

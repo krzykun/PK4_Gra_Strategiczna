@@ -10,6 +10,7 @@ class Unit :
 protected:
 	int dest_x, dest_y;
 	Game_Object* target;
+	int speed;
 public:
 	Unit(int, int, int, char);
 	Unit(std::ifstream &);

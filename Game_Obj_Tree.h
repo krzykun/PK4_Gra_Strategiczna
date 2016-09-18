@@ -8,7 +8,7 @@ protected:
 	static int production_time;
 public:
 	Game_Obj_Tree(int, int, int);
-	Game_Obj_Tree(std::ifstream &);
+	Game_Obj_Tree(int, int, std::ifstream &);
 	~Game_Obj_Tree();
 
 	void save_object(std::ofstream &);

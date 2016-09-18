@@ -6,10 +6,18 @@ Unit_Knight::Unit_Knight(int owner, int pos_x, int pos_y) : Unit(owner, pos_x, p
 {
 	health = 100;
 	energy = 0;
+	speed = 1;
 	set_name("Knight");
 	set_description("A brave shiny piece of metal.");
 	set_state(idle);
 	set_target(this);
+}
+
+Unit_Knight::Unit_Knight(int pos_x, int pos_y, std::ifstream & load_from) : Unit(load_from)
+{
+	speed = 1;
+	set_name("Knight");
+	set_description("A brave shiny piece of metal.");	
 }
 
 

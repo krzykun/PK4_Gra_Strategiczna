@@ -11,7 +11,7 @@ User::User(int height, int width)
 	user_number = number_of_active_users;
 	User::number_of_active_users++;
 	screen_height = height;
-	scren_total_height = height + 5;
+	screen_total_height = height + 5;
 	screen_width = width;
 	screen_total_width = width + 4;
 	screen_pos_x = 0;
@@ -48,7 +48,9 @@ void User::modify_setting()
 	{
 		int new_height;
 		user_input >> new_height;
+		// new_height > mapsize ? :<
 		screen_height = new_height;
+		screen_total_height = new_height + 5;
 		std::cout << "New height is " << screen_height << std::endl;
 	}
 	else if (option == 1)
@@ -56,6 +58,7 @@ void User::modify_setting()
 		int new_width;
 		user_input >> new_width;
 		screen_width = new_width;
+		screen_total_width = new_width + 4;
 		std::cout << "New width is " << screen_width << std::endl;
 	}
 	else if (option == 2)
@@ -114,7 +117,11 @@ void User::draw_mapview(std::string & interface, std::string & mapview)
 void User::draw_ui(std::string & interface, std::stringstream & output_stream)
 {
 	std::string unit_name, status, health;
+	char* tmp_desc = new char[screen_width];
 	output_stream >> unit_name >> status >> health;
+	output_stream.getline(tmp_desc, screen_width);
+	std::string description(tmp_desc);
+	delete[] tmp_desc;
 	std::string str1(" UNIT NAME");
 	std::string str2("UNIT STATUS ");
 	int pause1to2 = screen_total_width - str1.length() - str2.length() - 2;
@@ -137,14 +144,10 @@ void User::draw_ui(std::string & interface, std::stringstream & output_stream)
 	{
 		interface += ' ';
 	}
-	interface += status;
-	interface += ' ';
-	interface += interface_brick;
-	interface += '\n';
-	interface += interface_brick;
-	interface += ' ';
-	interface += "HEALTH:";
-	interface += health;
+	interface += status;	interface += ' ';	interface += interface_brick;	interface += '\n';
+	interface += interface_brick;	interface += ' ';	interface += "\n";
+	interface += interface_brick;	interface += " HEALTH: ";	interface += health;	interface += '\n';
+	interface += interface_brick;	interface += description;	interface += '\n';
 }
 
 void User::show_to_player(std::stringstream & output_stream)
@@ -164,7 +167,7 @@ void User::show_to_player(std::stringstream & output_stream)
 	draw_ui(interface, output_stream);
 	draw_interface_line(interface, interface_brick);
 
-	std::cout << interface << std::endl;
+	std::cout << std::endl << interface << std::endl;
 }
 
 void User::draw_menu()
@@ -172,8 +175,9 @@ void User::draw_menu()
 	std::string interface = "";
 	draw_interface_line(interface, interface_brick);
 	interface += "\n STRATEGY GAME MENU\nAvailable commands:\n\n";
-	interface += "User options: change [height/width/brick] [new value]\n";
+	interface += "User options:\nchange [height/width/brick] [new value]\n";
 	interface += "create match [mapsize]\nload match [filename]\nsave match [filename]\n";
+	interface += "select [x] [y]\nattack [x] [y]\nclose\nexit\n";
 	draw_interface_line(interface, interface_brick);
 	std::cout << interface << std::endl;
 }

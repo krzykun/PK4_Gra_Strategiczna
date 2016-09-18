@@ -10,6 +10,7 @@ Unit::Unit(int owner, int pos_x, int pos_y, char symbol) : Game_Object(owner, po
 Unit::Unit(std::ifstream & load_from) : Game_Object(load_from), weapon(0,0)
 {
 	load_from >> dest_x >> dest_y;
+	set_target(this);
 }
 
 Unit::~Unit()

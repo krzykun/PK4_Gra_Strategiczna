@@ -15,7 +15,7 @@ class Map
 	Graphic_Object* null_elem;
 public:
 	Map(int, int, Graphic_Object*);
-	Map(std::ifstream &, int);	//int is the choice between terrain 0 or unit layer 1
+	Map(std::ifstream &, int, Graphic_Object*);	//int is the choice between terrain 0 or unit layer 1
 	~Map();
 
 	void save_Map(std::ofstream &);
@@ -27,6 +27,6 @@ public:
 
 	std::string & draw();
 	std::string show_selection(int, int);
-
+	void set_unit_order(int, int, user_action, std::stringstream &);
 };
 

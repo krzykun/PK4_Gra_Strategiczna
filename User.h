@@ -9,7 +9,7 @@ class User
 {
 	int user_number;
 	int screen_height;
-	int scren_total_height;
+	int screen_total_height;
 
 	int screen_width;
 	int screen_total_width;
@@ -21,7 +21,7 @@ class User
 	std::stringstream user_input;
 public:
 
-	User(int height = 15, int width = 30);
+	User(int height = 36, int width = 36);
 	~User();
 	void read_user_input();
 	std::stringstream & give_input();			//returns the user input

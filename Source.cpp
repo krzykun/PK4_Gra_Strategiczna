@@ -46,6 +46,7 @@ int main()
 	
 	User::init_player_number();
 	Program_Core Core;
+	Gamestate::null_game_object = Match::null_graphic_object;
 	
 	try
 	{

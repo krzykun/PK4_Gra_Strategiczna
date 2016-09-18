@@ -26,10 +26,6 @@ Program_Core::~Program_Core()
 
 void Program_Core::interpret_user_command()
 {
-	if (current_match)
-	{
-		this->draw_match();
-	}
 	for (int i = 0; i < number_of_active_users; i++)
 	{
 		std::stringstream & user_input_stream = active_users[i]->give_input();
@@ -44,7 +40,11 @@ void Program_Core::interpret_user_command()
 		{
 			std::cout << "CORE> " << e.what() << std::endl;
 		}
-		//flush stream
+		user_input_stream.clear();
+	}
+	if (current_match)
+	{
+		this->draw_match();
 	}
 }
 
@@ -101,7 +101,7 @@ void Program_Core::load_match(int player_number, user_action action, std::string
 
 	if (tmp_users_number != number_of_active_users)
 	{
-		throw exc_base("Wrong number of users, add new users.\n");
+		throw exc_base("Wrong number of users, add or delete users.\n");
 	}
 	current_match = new Match(load_from);
 }
@@ -154,6 +154,7 @@ void Program_Core::close_match(int, user_action, std::stringstream &)
 		throw exc_base("No match to close.\n");
 	}
 	current_match->~Match();
+	current_match = 0;
 }
 
 void Program_Core::exit(int, user_action, std::stringstream &)

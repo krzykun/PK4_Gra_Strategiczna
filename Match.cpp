@@ -11,11 +11,11 @@
 
 //Graphic_Object* Match::null_game_object = (Graphic_Object*)0;	//setting up the null object. this pointer will be copied to Gamestate
 
-Graphic_Object* Match::null_graphic_object = new Graphic_Object(0);
+Graphic_Object* Match::null_graphic_object = new Graphic_Object(' ');
 
 Match::Match(int _mapsize_x, int _mapsize_y, int _players) : number_of_active_users(_players)
 {
-	gamestate = new Gamestate(_mapsize_x, _mapsize_y, null_graphic_object);
+	gamestate = new Gamestate(_mapsize_x, _mapsize_y);
 	mapsize_x = _mapsize_x;
 	mapsize_y = _mapsize_y;
 	for (int i = 0; i < number_of_active_users; i++)
@@ -25,11 +25,6 @@ Match::Match(int _mapsize_x, int _mapsize_y, int _players) : number_of_active_us
 		selected.push_back(tmp);
 		player_streams.push_back(new std::stringstream);
 	}
-}
-
-Match::Match(std::stringstream & command_stream, int number_of_active_users)
-{
-	//todos?
 }
 
 Match::Match(std::ifstream & load_from)
@@ -76,8 +71,14 @@ void Match::interpret_user_command(int calling_user, user_action action, std::st
 		{
 			throw exc_base("Skipping the turn...\n");
 		}
+		else if ((action == move) || (action == attack))	//set unit actions
+		{
+			int curr_x = selected[calling_user][0];
+			int curr_y = selected[calling_user][1];
+			gamestate->order_unit(curr_x, curr_y, action, command_stream);
+		}
 
-		implement_turn();
+		implement_turn();	//commence unit actions
 	}
 	catch (const std::exception & e)
 	{
@@ -107,7 +108,6 @@ void Match::draw_match()
 		*(player_streams[i]) << mapsize_x << ' ' << mapsize_y << ' ' << gamestate->draw();
 		*(player_streams[i]) << gamestate->show_selection(selected[i][0], selected[i][1]);
 		//*(player_streams[i]) << " CranK " << "ducked " << 9001;
-		
 	}
 	return;
 }
