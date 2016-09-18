@@ -12,29 +12,6 @@
 
 int main()
 {
-	/*
-	Graphic_Object nowy('P');
-	Graphic_Object nowy2;
-	std::cout << nowy.draw() << nowy2.draw();
-	int bzdet;
-	std::cin >> bzdet;
-	system("pause");
-	Map mapka1(100, 100, &nowy);
-	std::cout << mapka1.show_gamefield(0,0).str() << std::endl;
-	system("pause");
-	*/
-	/*
-	Gamestate test1;
-	test1.tmp_set_filler('2');
-	std::cout << test1.draw();
-	*/
-	/*
-	Match abc(10, 10, 1);
-	abc.draw_match();
-	std::cout << abc.player_streams[0]->str();
-	*/
-
-
 	command_map.emplace(select, &(Program_Core::inmatch_command));
 	command_map[move] = &(Program_Core::inmatch_command);
 	command_map[attack] = &(Program_Core::inmatch_command);
@@ -46,6 +23,7 @@ int main()
 	command_map[new_match] = &(Program_Core::create_new_match);
 	command_map[add_user] = &(Program_Core::add_new_user);
 	command_map[delete_user] = &(Program_Core::delete_user);
+	command_map[close_match] = &(Program_Core::close_match);
 	command_map[exit_app] = &(Program_Core::exit);
 
 	map_str_to_action["select"] = select;
@@ -58,7 +36,8 @@ int main()
 	map_str_to_action["load"] = load_match;
 	map_str_to_action["new"] = new_match;
 	map_str_to_action["add_user"] = add_user;
-	map_str_to_action["delete"] = delete_user;
+	map_str_to_action["delete"] = delete_user; 
+	map_str_to_action["close"] = close_match;
 	map_str_to_action["exit"] = exit_app;
 
 	map_str_to_option["height"] = user_height;
@@ -75,9 +54,13 @@ int main()
 			Core.interpret_user_command();
 		}
 	}
+	catch (const std::exception & e)
+	{
+		std::cout << "CORE> " << e.what() << std::endl;
+	}
 	catch (...)
 	{
-		std::cout << "unidentified error. Closing game..." << std::endl;
+		std::cout << "CORE> An unidentified error occured. Closing game..." << std::endl;
 	}
 	
 	/*

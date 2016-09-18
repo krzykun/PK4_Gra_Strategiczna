@@ -28,6 +28,7 @@ public:
 	void inmatch_command(int, user_action, std::stringstream &);
 	void add_new_user(int, user_action, std::stringstream &);
 	void delete_user(int, user_action, std::stringstream &);
+	void close_match(int, user_action, std::stringstream &);
 	void exit(int, user_action, std::stringstream &);
 
 	//side functions

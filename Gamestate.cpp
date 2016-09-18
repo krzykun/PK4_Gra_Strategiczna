@@ -25,6 +25,7 @@ Gamestate::Gamestate(std::ifstream & load_from) : terrain(load_from, 0), ingame(
 
 Gamestate::~Gamestate()
 {
+	delete null_game_object;
 }
 
 void Gamestate::tmp_set_filler(char znak_fillera)
@@ -44,7 +45,7 @@ std::string Gamestate::draw()
 {
 	std::string terrain_tmp = terrain.draw();
 	std::string ingame_tmp = ingame.draw();
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < ingame_tmp.length(); i++)
 	{
 		if (ingame_tmp[i])
 		{

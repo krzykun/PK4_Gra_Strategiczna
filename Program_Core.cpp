@@ -1,9 +1,11 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <exception>
 
 #include "local_types_definitions.h"
 #include "Program_Core.h"
+#include "exc_base.h"
 
 std::map<user_action, void (Program_Core::*)(int, user_action, std::stringstream &)> command_map;
 
@@ -34,15 +36,24 @@ void Program_Core::interpret_user_command()
 		user_action action = change_option;	//initialized just so the compiler wont complain
 		user_input_stream >> action;
 
-		//THROW exceptions handling blcok goes here
-		(this->*(command_map[action]))(i, action, user_input_stream);
-		//flush ssream?
+		try
+		{
+			(this->*(command_map[action]))(i, action, user_input_stream);
+		}
+		catch (const exc_base & e)
+		{
+			std::cout << "CORE> " << e.what() << std::endl;
+		}
+		//flush stream
 	}
 }
 
 void Program_Core::create_new_match(int player_number, user_action action, std::stringstream & command_stream)
 {
-	//THROW if match present
+	if (current_match)
+	{
+		throw exc_base("A Match already exists. Cannot create a new one.\n");
+	}
 	int mapsize_x, mapsize_y;
 	command_stream >> mapsize_x >> mapsize_y;
 	current_match = new Match(mapsize_x, mapsize_y, number_of_active_users);
@@ -53,7 +64,7 @@ void Program_Core::save_match(int player_number, user_action action, std::string
 {
 	if (!current_match)
 	{
-		std::cout << "No match exists to be saved." << std::endl;
+		throw exc_base("No match exists to be saved.\n");
 	}
 	std::string str_filename;
 	command_stream >> str_filename;
@@ -62,7 +73,7 @@ void Program_Core::save_match(int player_number, user_action action, std::string
 
 	if (!save_here)
 	{
-		std::cout << "File opening error." << std::endl;
+		throw exc_base("File opening error.\n");
 	}
 
 	save_here << Program_Core::number_of_active_users << ' ';
@@ -73,8 +84,7 @@ void Program_Core::load_match(int player_number, user_action action, std::string
 {
 	if (current_match)
 	{
-		std::cout << "A match is already in play, cannot load a new one." << std::endl;
-		return;
+		throw exc_base("A match is already in play, cannot load a new one.\n");
 	}
 	std::string str_filename;
 	command_stream >> str_filename;
@@ -83,8 +93,7 @@ void Program_Core::load_match(int player_number, user_action action, std::string
 
 	if (!load_from)
 	{
-		std::cout << "File opening error." << std::endl;
-		return;
+		throw exc_base("File opening error.\n");
 	}
 
 	int tmp_users_number;
@@ -92,8 +101,7 @@ void Program_Core::load_match(int player_number, user_action action, std::string
 
 	if (tmp_users_number != number_of_active_users)
 	{
-		std::cout << "Wrong number of users, add new users." << std::endl;
-		return;
+		throw exc_base("Wrong number of users, add new users.\n");
 	}
 	current_match = new Match(load_from);
 }
@@ -111,14 +119,16 @@ void Program_Core::inmatch_command(int player_number, user_action action, std::s
 	}
 	else
 	{
-		std::cout << "No match present." << std::endl;
+		throw exc_base("No match present.\n");
 	}
 }
 
 void Program_Core::add_new_user(int, user_action, std::stringstream & command_stream)
 {
-
-	//THROW if match is underway
+	if (current_match)
+	{
+		throw exc_base("A match is underway, cannot add users during a Match.\n");
+	}
 	User* new_user = new User;
 	active_users.push_back(new_user);
 	Program_Core::number_of_active_users++;
@@ -127,16 +137,32 @@ void Program_Core::add_new_user(int, user_action, std::stringstream & command_st
 
 void Program_Core::delete_user(int, user_action, std::stringstream & command_stream)
 {
-	//THROW if match is underway
+	if (current_match)
+	{
+		throw exc_base("A match is underway, cannot delete users during a Match.\n");
+	}
 	int delete_me;
 	command_stream >> delete_me;
 	delete active_users[delete_me];
 	Program_Core::number_of_active_users--;
 }
 
+void Program_Core::close_match(int, user_action, std::stringstream &)
+{
+	if (!current_match)
+	{
+		throw exc_base("No match to close.\n");
+	}
+	current_match->~Match();
+}
+
 void Program_Core::exit(int, user_action, std::stringstream &)
 {
-	throw 1;
+	if (current_match)
+	{
+		throw exc_base("A match is underway, please end it first before leaving.\n");
+	}
+	throw std::exception("Closing game...\n");
 }
 
 bool Program_Core::is_match_in_progress()

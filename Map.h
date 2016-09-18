@@ -4,6 +4,8 @@
 #include <fstream>
 
 #include "Graphic_Object.h"
+#include "Game_Object.h"
+#include "Unit.h"
 
 class Map
 {
@@ -20,8 +22,8 @@ public:
 
 	void add_object(Graphic_Object&, int, int);
 	void implement_turn();
-	void unit_wants_to_move(int, int, int, int);
-	void unit_wants_to_attack(int, int, int, int);
+	void unit_wants_to_move(Unit*);
+	void unit_wants_to_attack(Unit*, Game_Object*);
 
 	std::string & draw();
 	std::string show_selection(int, int);

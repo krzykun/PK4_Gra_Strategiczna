@@ -4,10 +4,12 @@ int Unit_Knight::production_time = 10;
 
 Unit_Knight::Unit_Knight(int owner, int pos_x, int pos_y) : Unit(owner, pos_x, pos_y, 'K')
 {
-	health = 50;
+	health = 100;
 	energy = 0;
 	set_name("Knight");
 	set_description("A brave shiny piece of metal.");
+	set_state(idle);
+	set_target(this);
 }
 
 

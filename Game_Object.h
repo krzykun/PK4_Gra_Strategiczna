@@ -10,7 +10,7 @@ class Game_Object :
 	//these variables are modified by Game_Object
 	int owner;	//player that can control this object
 	int pos_x, pos_y;	//position of object
-	std::vector<int> buffs; //TODO
+	//std::vector<int> buffs; FUTURE TODO
 	std::string object_name;
 	std::string description;
 	game_obj_state state; //protected ?
@@ -27,10 +27,13 @@ public:
 	virtual ~Game_Object();
 
 	//funtions to manipulate the object with
-	int modify_health(int modifier) { health += modifier; }
-	int modify_energy(int modifier) { return energy += modifier; }
+	void modify_health(int modifier) { health += modifier; }
+	void modify_energy(int modifier) { energy += modifier; }
+	int get_x(){ return pos_x; }
+	int get_y(){ return pos_y; }
 	void save_object(std::ofstream &);
 	std::string print_me();
 	game_obj_state get_state(){ return state; }
+	void set_state(game_obj_state _s){ state = _s; }
 };
 

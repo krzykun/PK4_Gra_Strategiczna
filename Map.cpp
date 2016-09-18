@@ -17,6 +17,7 @@ Map::Map(int size_x, int size_y, Graphic_Object* filler)
 		for (int j = 0; j < mapsize_y; j++)
 			gamefield[i][j] = filler;
 	}
+	null_elem = filler;
 }
 
 Map::Map(std::ifstream & load_from, int map_type)
@@ -55,25 +56,28 @@ Map::Map(std::ifstream & load_from, int map_type)
 				case 'K':
 				{
 					gamefield[i][j] = new Unit_Knight(owner, i, j);
+					Unit* pUnit = (reinterpret_cast<Unit*>(gamefield[i][j]));
+					pUnit->set_target(pUnit);
+					break;
+				}
+				default:
+				{
+					gamefield[i][j] = null_elem;
+					break;
 				}
 				}
 
 			}
-				
-				
-				
-				//gamefield[i][j] = new Game_Object(load_from);
-
-			//TODO: a function recognizing which element needs to be created
-			//bc element can be larger than 1 square, we check if it is repeated above or
+			//FUTURE TODO: bc element can be larger than 1 square, we check if it is repeated above or
 			//just before our field. if it is, we tie it to that. if its not, we create a new one
-			//TODO: a list of symbols that need to be checked
+			//FUTURE TODO: a list of symbols that need to be checked
 		}
 	}
 }
 
 Map::~Map()
 {
+	delete[] gamefield;
 }
 
 void Map::save_Map(std::ofstream & save_here)
@@ -95,33 +99,65 @@ void Map::implement_turn()
 	{
 		for (int j = 0; j < mapsize_y; j++)
 		{
-			//THROW control block, if the move/attack action does not succeed
+			//THROW control block?? not needed
 			if (typeid(Unit) == typeid(gamefield[i][j]))
 			{
 				Unit* pUnit = reinterpret_cast<Unit*> (gamefield[i][j]);
+				Game_Object* target = pUnit->get_target();
+				if ((pUnit->get_x() == pUnit->get_target_x()) && (pUnit->get_y() == pUnit->get_target_y()))
+					pUnit->set_state(idle);
+
 				game_obj_state tmp_state = pUnit->get_state();
 				if ( tmp_state == move)
 				{
-					unit_wants_to_move(i, j, pUnit->get_target_x(), pUnit->get_target_y() );
+					unit_wants_to_move(pUnit);
 				}
-				else if (tmp_state == attack)
+				else if ( tmp_state == attack )
 				{
-					unit_wants_to_attack(i, j, pUnit->get_target_x(), pUnit->get_target_y());
+					int tmp_x = target->get_x();
+					int tmp_y = target->get_y();
+					Game_Object* pG_Obj = reinterpret_cast <Game_Object*> (gamefield[tmp_x][tmp_y]);
+					unit_wants_to_attack(pUnit, pG_Obj);
 				}
 			}
 		}
 	}
 }
 
-void Map::unit_wants_to_move(int, int, int, int)
+void Map::unit_wants_to_move(Unit* move_me)
 {
-	//todo
+	bool direction[2];	// tells us if the unit wants to move forward or backward
+	int curr_x = move_me->get_x();
+	int dest_x = move_me->get_target_x();
+	int curr_y = move_me->get_y();
+	int dest_y = move_me->get_target_y();
+	int unit_speed = move_me->get_unit_speed();
+
+	direction[0] = ((dest_x - curr_x) > 0);	//1 forward 0 backward
+	direction[1] = ((dest_y - curr_y) > 0);
+
+	int new_x, new_y;
+	if (direction[0]) new_x = curr_x + unit_speed; else new_x = curr_x - unit_speed;
+	if (direction[1]) new_y = curr_y + unit_speed; else new_y = curr_y - unit_speed;
+
+	if (gamefield[new_x][new_y] != null_elem)
+	{	//if the field is taken (null element not occuping it), dont move
+		return;
+	}
+	//everything fine, time to swap the object with null_elem
+	gamefield[new_x][new_y] = reinterpret_cast<Graphic_Object*> (move_me);
+	gamefield[curr_x][curr_y] = null_elem;
+	move_me->set_dxdy(new_x, new_y);
 }
 
 
-void Map::unit_wants_to_attack(int, int, int, int)
+void Map::unit_wants_to_attack(Unit* src_unit, Game_Object* dest_obj)
 {
-	//todo
+	if ( src_unit->try_to_attack() )
+	{	//value of 1 means that the target was out of range
+		src_unit->set_dxdy(dest_obj->get_x(), dest_obj->get_y());	//get the coordinates of target
+		unit_wants_to_move(src_unit);	//try to move closer to target current destination
+	}
 }
 
 std::string & Map::draw()
@@ -130,6 +166,7 @@ std::string & Map::draw()
 	for (int i = 0; i < mapsize_x; i++)
 	{
 		for (int j = 0; j < mapsize_y; j++)
+			if (gamefield[i][j] != null_elem)
 			previous_map += gamefield[i][j]->draw();
 	}
 	return previous_map;
@@ -137,5 +174,9 @@ std::string & Map::draw()
 
 std::string Map::show_selection(int pos_x, int pos_y)
 {
-	return gamefield[pos_x][pos_y]->print_me();
+	std::string tmp(" Nothing to show. ");
+	if (gamefield[pos_x][pos_y] == null_elem)
+		return tmp;
+	else
+		return gamefield[pos_x][pos_y]->print_me();
 }
