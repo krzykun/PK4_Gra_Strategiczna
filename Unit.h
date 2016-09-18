@@ -13,7 +13,7 @@ protected:
 	int speed;
 public:
 	Unit(int, int, int, char);
-	Unit(std::ifstream &);
+	Unit(int, int, std::ifstream &);
 	virtual ~Unit();
 
 	//functions to use

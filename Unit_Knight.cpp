@@ -13,7 +13,7 @@ Unit_Knight::Unit_Knight(int owner, int pos_x, int pos_y) : Unit(owner, pos_x, p
 	set_target(this);
 }
 
-Unit_Knight::Unit_Knight(int pos_x, int pos_y, std::ifstream & load_from) : Unit(load_from)
+Unit_Knight::Unit_Knight(int pos_x, int pos_y, std::ifstream & load_from) : Unit(pos_x, pos_y, load_from)
 {
 	speed = 1;
 	set_name("Knight");

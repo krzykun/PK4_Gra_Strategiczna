@@ -109,14 +109,13 @@ void Map::implement_turn()
 		for (int j = 0; j < mapsize_y; j++)
 		{
 			//THROW control block?? not needed
-			if (gamefield[i][j] != null_elem)
+			if (typeid(Unit_Knight) == typeid(*(gamefield[i][j])))
 			{
 				Unit* pUnit = reinterpret_cast<Unit*> (gamefield[i][j]);
 				Game_Object* target = pUnit->get_target();
-				if ((pUnit->get_x() == pUnit->get_target_x()) && (pUnit->get_y() == pUnit->get_target_y()))
-					pUnit->set_state(idle);
 
 				game_obj_state tmp_state = pUnit->get_state();
+				//std::cout << "\nKnight detected at [" << i << "][" << j << "] state:" << tmp_state << std::endl;
 				if ( tmp_state == move)
 				{
 					unit_wants_to_move(pUnit);
@@ -128,8 +127,10 @@ void Map::implement_turn()
 					Game_Object* pG_Obj = reinterpret_cast <Game_Object*> (gamefield[tmp_x][tmp_y]);
 					unit_wants_to_attack(pUnit, pG_Obj);
 				}
+				if ((pUnit->get_x() == pUnit->get_target_x()) && (pUnit->get_y() == pUnit->get_target_y()))
+					pUnit->set_state(idle);
 			}
-			else throw exc_base("Nothing to attack there.\n");
+			//else throw exc_base("Nothing there.\n");
 		}
 	}
 }
@@ -137,27 +138,66 @@ void Map::implement_turn()
 void Map::unit_wants_to_move(Unit* move_me)
 {
 	bool direction[2];	// tells us if the unit wants to move forward or backward
+	bool should_i_move[2];	//tells the unit should it move at all in that axis
 	int curr_x = move_me->get_x();
 	int dest_x = move_me->get_target_x();
 	int curr_y = move_me->get_y();
 	int dest_y = move_me->get_target_y();
 	int unit_speed = move_me->get_unit_speed();
+	/*
+	std::cout << "Knight from [" << curr_x << "][" << curr_y << "] wants to move to [";
+	std::cout << dest_x << "][" << dest_y << "].\n";
+	*/
+	should_i_move[0] = ((dest_x - curr_x) != 0);		//x axis
+	should_i_move[1] = ((dest_y - curr_y) != 0);		//y axis
 
 	direction[0] = ((dest_x - curr_x) > 0);	//1 forward 0 backward
 	direction[1] = ((dest_y - curr_y) > 0);
 
-	int new_x, new_y;
-	if (direction[0]) new_x = curr_x + unit_speed; else new_x = curr_x - unit_speed;
-	if (direction[1]) new_y = curr_y + unit_speed; else new_y = curr_y - unit_speed;
+	//std::cout << "Our guy should move ";
 
-	if (gamefield[new_x][new_y] != null_elem)
+	int new_x = curr_x, new_y = curr_y;
+	if (should_i_move[0])
+	{
+		//std::cout << "in x(vertical) axis ";
+		if (direction[0])
+		{
+			//std::cout << "in positive(down) direction\n";
+			new_x = curr_x + unit_speed;
+		}
+		else
+		{
+			//std::cout << "in negative(up) direction\n";
+			new_x = curr_x - unit_speed;
+		}
+	}
+	if (should_i_move[1])
+	{
+		//std::cout << ", and in y(horizontal) axis ";
+		if (direction[1])
+		{
+			//std::cout << "in positive(right) direction.\n";
+			new_y = curr_y + unit_speed;
+		}
+		else
+		{
+			//std::cout << "in negative(left) direction.\n";
+			new_y = curr_y - unit_speed;
+		}
+	}
+	//std::cout << "New place of our Knight will be [" << new_x << "][" << new_y << "]\n";
+
+	if (gamefield[new_x][new_y] != null_elem)	//error?
 	{	//if the field is taken (null element not occuping it), dont move
 		return;
 	}
 	//everything fine, time to swap the object with null_elem
+	//std::cout << "Swapping the 2 now...\n";
+	move_me->set_x(new_x);
+	move_me->set_y(new_y);
+	move_me->set_dxdy(dest_x, dest_y);
 	gamefield[new_x][new_y] = reinterpret_cast<Graphic_Object*> (move_me);
 	gamefield[curr_x][curr_y] = null_elem;
-	move_me->set_dxdy(new_x, new_y);
 }
 
 
@@ -199,13 +239,12 @@ enum game_obj_state{ idle, moving, attacking, in_construction };*/
 
 void Map::set_unit_order(int pos_x, int pos_y, user_action action, std::stringstream & command_stream)
 {
-
 	int tarx, tary;
 	command_stream >> tarx >> tary;
 	Unit* pUnit = reinterpret_cast<Unit*> (gamefield[pos_x][pos_y]);
 	if (action == attack)
 	{
-		if (gamefield[tarx][tary] != null_elem)
+		if (typeid(Game_Object) == typeid(*(gamefield[tarx][tary])))
 		{
 			Game_Object* pG_Obj = reinterpret_cast<Game_Object*> (gamefield[tarx][tary]);
 			pUnit->set_target(pG_Obj);

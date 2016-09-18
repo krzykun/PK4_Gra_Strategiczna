@@ -64,17 +64,5 @@ int main()
 		std::cout << "CORE> An unidentified error occured. Closing game..." << std::endl;
 	}
 	
-	/*
-	Core.create_new_match(100, 100);
-	Core.draw_match();
-	Core.save_match(filename);
-	*/
-
-	//std::string teststring("input_test.txt");
-	//const char* filename = teststring.c_str();
-	////Core.load_match(filename);
-
-	//Core.draw_match();
-
 	system("pause");
 }

@@ -10,8 +10,10 @@ Game_Object::Game_Object(int _owner, int _pos_x, int _pos_y, char _symbol) : Gra
 	description = "This object is not meant to exist in this form.";
 }
 
-Game_Object::Game_Object(std::ifstream & load_from) : Graphic_Object(load_from)
+Game_Object::Game_Object(int _pos_x, int _pos_y, std::ifstream & load_from) : Graphic_Object(load_from)
 {
+	pos_x = _pos_x;
+	pos_y = _pos_y;
 	load_from >> owner;
 	load_from >> health;
 	load_from >> energy;

@@ -23,14 +23,16 @@ protected:
 
 public:
 	Game_Object(int, int, int, char);
-	Game_Object(std::ifstream &);
+	Game_Object(int, int, std::ifstream &);
 	virtual ~Game_Object();
 
 	//funtions to manipulate the object with
 	void modify_health(int modifier) { health += modifier; }
 	void modify_energy(int modifier) { energy += modifier; }
 	int get_x(){ return pos_x; }
+	void set_x(int x) { pos_x = x; }
 	int get_y(){ return pos_y; }
+	void set_y(int y) { pos_y = y; }
 	void save_object(std::ofstream &);
 	std::string print_me();
 	game_obj_state get_state(){ return state; }

@@ -11,7 +11,7 @@ Game_Obj_Tree::Game_Obj_Tree(int _owner, int _pos_x, int _pos_y) : Game_Object(_
 	set_state(idle);
 }
 
-Game_Obj_Tree::Game_Obj_Tree(int pos_x, int pos_y, std::ifstream & load_from) : Game_Object(load_from)
+Game_Obj_Tree::Game_Obj_Tree(int pos_x, int pos_y, std::ifstream & load_from) : Game_Object(pos_x, pos_y, load_from)
 {
 	set_name("Tree");
 	set_description("Green, leafy, oxygen goodness.");

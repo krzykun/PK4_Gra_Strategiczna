@@ -56,6 +56,7 @@ void Match::save_Match(std::ofstream & save_here)
 
 void Match::implement_turn()
 {
+	turn_number++;
 	gamestate->implement_turn();
 }
 
@@ -69,6 +70,7 @@ void Match::interpret_user_command(int calling_user, user_action action, std::st
 		}
 		else if (action == turn)
 		{
+			implement_turn();
 			throw exc_base("Skipping the turn...\n");
 		}
 		else if ((action == move) || (action == attack))	//set unit actions
@@ -107,7 +109,6 @@ void Match::draw_match()
 		player_streams[i]->clear();	//error przy zabijaniu progframu
 		*(player_streams[i]) << mapsize_x << ' ' << mapsize_y << ' ' << gamestate->draw();
 		*(player_streams[i]) << gamestate->show_selection(selected[i][0], selected[i][1]);
-		//*(player_streams[i]) << " CranK " << "ducked " << 9001;
 	}
 	return;
 }
